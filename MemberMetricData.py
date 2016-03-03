@@ -30,4 +30,7 @@ class MemberMetricData():
         return self.metric_value
 
     def print(self):
-        print("MemberId[%d], MetricId [%d], MetricDataType[%s], MetricValue[%s]" % (self.getMemberId(), self.getMetricId(), self.getMetricDataType(), self.getMetricValue()))
+        try:
+            print("MemberId[%d], MetricId [%d], MetricDataType[%s], MetricValue[%s]" % (self.getMemberId(), self.getMetricId(), self.getMetricDataType(), self.getMetricValue()))
+        except TypeError as e:
+            print("The following values are being skipped: ", self.getMemberId(), self.getMetricId(), self.getMetricDataType(), self.getMetricValue())

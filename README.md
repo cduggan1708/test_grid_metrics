@@ -2,6 +2,8 @@ Requirements:
 
 Must pass in an excel file
 
+The test grid sheet must be named 'Grid'
+
 File must not be open while script is executing (cannot write to an open file)
 
 Cells must contain the metric value (that is, not an x or some placeholder)
