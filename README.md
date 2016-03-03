@@ -6,6 +6,8 @@ File must not be open while script is executing (cannot write to an open file)
 
 Cells must contain the metric value (that is, not an x or some placeholder)
 
+REFERENCE CODES are not currently handled so DO NOT include them in the excel file (can add them back after the script has finished)
+
 In column A, starting at any row, the following structure must be in place:
 
 MetricID
