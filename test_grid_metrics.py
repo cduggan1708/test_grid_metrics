@@ -1,0 +1,106 @@
+import sys, getopt
+from datetime import datetime
+import os
+import openpyxl
+from MemberMetricData import MemberMetricData
+
+column_letter = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H', 9: 'I', 10: 'J',
+                 11: 'K', 12: 'L', 13: 'M', 14: 'N', 15: 'O', 16: 'P', 17: 'Q', 18: 'R', 19: 'S',
+                 20: 'T', 21: 'U', 22: 'V', 23: 'W', 24: 'X', 25: 'Y', 26: 'Z', 27: 'AA', 28: 'AB',
+                 # specific values that are hardcoded (based on template)
+                 'MemberID': 'B'}
+
+def readMetricDataFromTestGrid(test_grid_file):
+    first_row, last_row, last_column, first_metric_column, grid_sheet = getRelevantCellsInTestGrid(test_grid_file)
+    # print(first_row, last_row, column_letter[first_metric_column], column_letter[last_column])
+    
+    # need MemberID, MetricID, MetricDataType and MetricValue
+    # mmd = MemberMetricData()
+    # mmd.setMemberId(100)
+    # mmd.setMetricId(1000)
+    # mmd.setMetricDataType('float')
+    # mmd.setMetricValue(20)
+
+    # iterate rows
+    for row in range(first_row + 2, last_row + 1):
+        member_id = grid_sheet[column_letter['MemberID'] + str(row)].value
+
+        # iterate columns
+        for column in range(first_metric_column, last_column + 1):        
+            #print("Cell %s%d\n" % (column_letter[column], row))
+            metric_value = grid_sheet[column_letter[column] + str(row)].value
+
+            # if metric value is None, there is nothing to insert
+            if metric_value is not None:
+                metric_id = grid_sheet[column_letter[column] + str(first_row)].value
+                metric_data_type = grid_sheet[column_letter[column] + str(first_row + 1)].value
+
+                mmd = MemberMetricData()
+                mmd.setMemberId(member_id)
+                mmd.setMetricId(metric_id)
+                mmd.setMetricDataType(metric_data_type)
+                mmd.setMetricValue(metric_value)
+                mmd.print()     
+
+
+def getRelevantCellsInTestGrid(test_grid_file):
+
+    workbook = openpyxl.load_workbook(test_grid_file)
+    grid_sheet = workbook.get_sheet_by_name('Grid')
+    last_row = grid_sheet.max_row
+    first_row = 1
+    i = 0
+    for row in range(1, last_row):
+        value = grid_sheet['A' + str(row)].value
+        i += 1
+        if value == 'MetricID': # this is the first cell we care about
+            first_row = i
+            break
+
+    last_column = grid_sheet.max_column
+    first_metric_column = 0
+    j = 0
+    for column in range(1, last_column):
+        value = grid_sheet[column_letter[column] + str(first_row)].value
+        j += 1
+
+        if first_metric_column == 0 and isinstance(value, int):
+            first_metric_column = j # first int we found, meaning first metric id
+
+        if first_metric_column != 0 and value is None:
+            break
+
+    #update last column to the one we care about
+    last_column = j - 1
+
+    print("Test Grid cells: A%d through %s" % (first_row, column_letter[last_column] + str(last_row)))
+
+    return (first_row, last_row, last_column, first_metric_column, grid_sheet)
+
+def main(argv):
+    test_grid_file = ''
+    try:
+        opts, args = getopt.getopt(argv, "hf:")
+    except:
+        print('test_grid_metrics.py -f <test grid filename>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('test_grid_metrics.py -f <test grid filename>')
+            sys.exit()
+        else:
+            if opt in ('-f', '--testGridFile'):
+                test_grid_file = arg
+    
+    # verify extension is excel file
+    filename, extension = os.path.splitext(test_grid_file)
+    if test_grid_file == '' or "xls" not in extension:
+        print('Usage: test_grid_metrics.py -f <test grid filename>')
+        sys.exit()
+
+    print("%s: Executed test_grid_metrics.py" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+    readMetricDataFromTestGrid(test_grid_file)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
