@@ -2,6 +2,10 @@ Requirements:
 
 Must pass in an excel file
 
+File must not be open while script is executing (cannot write to an open file)
+
+Cells must contain the metric value (that is, not an x or some placeholder)
+
 In column A, starting at any row, the following structure must be in place:
 
 MetricID
