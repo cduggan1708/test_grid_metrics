@@ -46,6 +46,8 @@ To run it with the test grid template:
 	I recommend spot checking the data against the grid to verify it looks accurate before entering it into the DB.
 
 
+To run with your own excel file, either copy the excel file into this directory or give the full path to the -f argument
+
 
 
 Requirements:
