@@ -38,3 +38,10 @@ From the first metric column, the script looks for a blank cell and considers th
 	This means that the test grid MUST contain a metric id for each column.
 
 	If there are metrics to be tested that do not yet have a metric id, they must be in columns after all the defined metrics. If there is a column with no metric id, that will be considered the end and no further columns will be considered.
+
+
+
+
+
+
+USE TestGridTemplate.xlsx AS TEMPLATE
