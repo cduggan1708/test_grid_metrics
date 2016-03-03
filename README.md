@@ -2,7 +2,7 @@ Requirements:
 
 Must pass in an excel file
 
-In column A, starting at any row, the following structure must be in place:
+In column A, starting at any row, the following structure must be in place:\n
 MetricID
 MetricDataType
 1
