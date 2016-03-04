@@ -44,6 +44,9 @@ To run it with the test grid template:
 	The first column is memberID, second column is metricID, third column is metric value and fourth column is the query that will be copied into the database to actually insert the data.
 
 	I recommend spot checking the data against the grid to verify it looks accurate before entering it into the DB.
+		You will need the variable @today at the top of the query:
+			DECLARE @today VARCHAR(100)
+			SET @today = convert(date, CURRENT_TIMESTAMP)
 
 
 To run with your own excel file, either copy the excel file into this directory or give the full path to the -f argument
