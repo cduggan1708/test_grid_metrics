@@ -44,9 +44,12 @@ To run it with the test grid template:
 	The first column is memberID, second column is metricID, third column is metric value and fourth column is the query that will be copied into the database to actually insert the data.
 
 	I recommend spot checking the data against the grid to verify it looks accurate before entering it into the DB.
-		You will need the variable @today at the top of the query:
+		You will need the variable @today and @yesterday at the top of the query:
 			DECLARE @today VARCHAR(100)
 			SET @today = convert(date, CURRENT_TIMESTAMP)
+
+			DECLARE @yesterday VARCHAR(100)
+			SET @yesterday = convert(date,DATEADD(d,-1,GETDATE()))
 
 
 To run with your own excel file, either copy the excel file into this directory or give the full path to the -f argument
@@ -63,7 +66,10 @@ File must not be open while script is executing (cannot write to an open file)
 
 Cells must contain the metric value (that is, not an x or some placeholder)
 
-REFERENCE CODES are not currently handled so DO NOT include them in the excel file (can add them back after the script has finished)
+Reference Codes can be entered in the test grid as the string code (i.e. DNP, N/A) and the script will translate that to the correct reference code id to insert.
+Any metric value that is a string will be considered a reference code because other than reference codes, all metric values should be numbers (i.e. float could be 199, boolean is 0 or 1, enum could be 229).
+Due to the fact that a common test case will be to have a reference code and an actual metric (number) for a given member, the script sets the reference code query to have @yesterday for measured, created.
+	This is necessary to create separate records in metricvalues table (if same measured/create, stored procedure will put reference code in same metricvalue record as float/bool/enum, which we do not want for testing).
 
 In column A, starting at any row, the following structure must be in place:
 

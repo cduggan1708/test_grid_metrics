@@ -12,7 +12,11 @@ column_letter = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H',
 
 metric_type_query = {'float': "exec [LifeChanging].[METD].[usp_InsertFloatValueActivities] @memberID = %d, @MetricID = %d, @Float = %s, @measured=@today,@CreatedAt=@today",
                      'boolean': "exec [LifeChanging].[METD].[usp_InsertBoolValueActivities] @memberID = %d, @MetricID = %d, @Bool = %s, @measured=@today,@CreatedAt=@today",
-                     'enum': "exec [LifeChanging].[METD].[usp_InsertEnumValueActivities] @memberID = %d, @MetricID = %d, @EnumValueID = %s, @measured=@today,@CreatedAt=@today"}
+                     'enum': "exec [LifeChanging].[METD].[usp_InsertEnumValueActivities] @memberID = %d, @MetricID = %d, @EnumValueID = %s, @measured=@today,@CreatedAt=@today",
+                     # use yesterday for reference codes so that if the member also have float/boolean/enum data for today, a separate record will be created for the reference code
+                     'refcode': "exec [LifeChanging].[METD].[usp_InsertReferenceCodeActivities] @memberID = %d, @MetricID = %d, @ReferenceCodeID = %s, @measured=@yesterday,@CreatedAt=@yesterday"}
+
+reference_code_id = {'DNP': 1, 'N/A': 2, 'P': 3, 'UTO': 4, 'QNS': 5, 'NSA': 6, 'RDNO': 7, 'RDNOX2': 8, 'NULL': 9, 'E4': 10, 'DSO': 11}
 
 def writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook, test_grid_file):
     sheet = workbook.create_sheet(title='InsertData')
@@ -23,6 +27,9 @@ def writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook
         metric_id = mmd.getMetricId()
         metric_value = mmd.getMetricValue()
         metric_data_type = mmd.getMetricDataType()
+        if metric_data_type == 'refcode':
+            metric_value = reference_code_id[metric_value]
+
         sheet['A' + str(i)] = member_id
         sheet['B' + str(i)] = metric_id
         sheet['C' + str(i)] = metric_value
@@ -55,7 +62,12 @@ def readMetricDataFromTestGrid(test_grid_file):
 
                     # if metric id is None, there is nothing to insert
                     if metric_id is not None:
-                        metric_data_type = grid_sheet[column_letter[column] + str(first_row + 1)].value
+
+                        # rule: if value is a string, set metric data type to refcode
+                        if isinstance(metric_value, str):
+                            metric_data_type = 'refcode'
+                        else:
+                            metric_data_type = grid_sheet[column_letter[column] + str(first_row + 1)].value
 
                         # if metric data type is None, there is nothing to insert
                         if metric_data_type is not None:
