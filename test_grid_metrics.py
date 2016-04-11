@@ -18,9 +18,17 @@ metric_type_query = {'float': "exec [LifeChanging].[METD].[usp_InsertFloatValueA
                      # use yesterday for reference codes so that if the member also have float/boolean/enum data for today, a separate record will be created for the reference code
                      'refcode': "exec [LifeChanging].[METD].[usp_InsertReferenceCodeActivities] @memberID = %d, @MetricID = %d, @ReferenceCodeID = %s, @measured=@yesterday,@CreatedAt=@yesterday"}
 
-reference_code_id = {'DNP': 1, 'N/A': 2, 'P': 3, 'UTO': 4, 'QNS': 5, 'NSA': 6, 'RDNO': 7, 'RDNOX2': 8, 'NULL': 9, 'E4': 10, 'DSO': 11}
+# sourceId, formTemplateId and clientId will need to be manually adjusted for now
+metric_type_query_rdc = {'float': "exec [LifeChanging].[METD].[usp_InsertFloatValueActivities_RDC] @memberID = %d, @MetricID = %d, @Float = %s, @measured=@today,@CreatedAt=@today,@ReceivedDate=@received,@sourceId=2,@formTemplateId=175,@clientId=10030",
+                     'boolean': "exec [LifeChanging].[METD].[usp_InsertBoolValueActivities_RDC] @memberID = %d, @MetricID = %d, @Bool = %s, @measured=@today,@CreatedAt=@today,@ReceivedDate=@received,@sourceId=2,@formTemplateId=175,@clientId=10030",
+                     'enum': "exec [LifeChanging].[METD].[usp_InsertEnumValueActivities_RDC] @memberID = %d, @MetricID = %d, @EnumValueID = %s, @measured=@today,@CreatedAt=@today,@ReceivedDate=@received,@sourceId=2,@formTemplateId=175,@clientId=10030",
+                     # use yesterday for reference codes so that if the member also have float/boolean/enum data for today, a separate record will be created for the reference code
+                     'refcode': "exec [LifeChanging].[METD].[usp_InsertReferenceCodeValueActivities_RDC] @memberID = %d, @MetricID = %d, @ReferenceCodeID = %s, @measured=@yesterday,@CreatedAt=@yesterday,@ReceivedDate=@received,@sourceId=2,@formTemplateId=175,@clientId=10030"}
 
-def writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook, test_grid_file):
+
+reference_code_id = {'DNP': 1, 'N/A': 2, 'P': 3, 'UTO': 4, 'QNS': 5, 'NSA': 6, 'RDNO': 7, 'RDNOX2': 8, 'NULL': 9, 'E4': 10, 'DSO': 11, 'NCAL': 12, 'N/S': 13, 'TNP': 14, 'SNS': 15}
+
+def writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook, test_grid_file, useRDC):
     sheet = workbook.create_sheet(title='InsertData')
 
     i = 1
@@ -35,13 +43,16 @@ def writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook
         sheet['A' + str(i)] = member_id
         sheet['B' + str(i)] = metric_id
         sheet['C' + str(i)] = metric_value
-        sheet['D' + str(i)] = metric_type_query[metric_data_type] % (member_id, metric_id, str(metric_value))
+        if useRDC:
+            sheet['D' + str(i)] = metric_type_query_rdc[metric_data_type] % (member_id, metric_id, str(metric_value))
+        else:
+            sheet['D' + str(i)] = metric_type_query[metric_data_type] % (member_id, metric_id, str(metric_value))
 
         i += 1
 
     workbook.save(test_grid_file)
 
-def readMetricDataFromTestGrid(test_grid_file):  
+def readMetricDataFromTestGrid(test_grid_file, useRDC):  
     first_row, last_row, last_column, first_metric_column, workbook = getRelevantCellsInTestGrid(test_grid_file)
     grid_sheet = workbook.get_sheet_by_name('Grid')
 
@@ -80,7 +91,7 @@ def readMetricDataFromTestGrid(test_grid_file):
                             mmd.setMetricValue(metric_value)
                             member_metric_data_list.append(mmd)
 
-    writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook, test_grid_file)
+    writeMemberMetricDataWithInsertsToNewSheet(member_metric_data_list, workbook, test_grid_file, useRDC)
 
 
 def getRelevantCellsInTestGrid(test_grid_file):
@@ -120,8 +131,9 @@ def getRelevantCellsInTestGrid(test_grid_file):
 
 def main(argv):
     test_grid_file = ''
+    useRDC = False
     try:
-        opts, args = getopt.getopt(argv, "hf:")
+        opts, args = getopt.getopt(argv, "hf:r")
     except:
         print('test_grid_metrics.py -f <test grid filename>')
         sys.exit(2)
@@ -132,6 +144,9 @@ def main(argv):
         else:
             if opt in ('-f', '--testGridFile'):
                 test_grid_file = arg
+
+        if opt in ('-r', '--useRDC'):
+            useRDC = True
     
     # verify extension is excel file
     filename, extension = os.path.splitext(test_grid_file)
@@ -141,7 +156,7 @@ def main(argv):
 
     print("%s: Executed test_grid_metrics.py" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    readMetricDataFromTestGrid(test_grid_file)
+    readMetricDataFromTestGrid(test_grid_file, useRDC)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
