@@ -14,6 +14,7 @@ column_letter = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G', 8: 'H',
 
 metric_type_query = {'float': "exec [LifeChanging].[METD].[usp_InsertFloatValueActivities] @memberID = %d, @MetricID = %d, @Float = %s, @measured=@today,@CreatedAt=@today",
                      'boolean': "exec [LifeChanging].[METD].[usp_InsertBoolValueActivities] @memberID = %d, @MetricID = %d, @Bool = %s, @measured=@today,@CreatedAt=@today",
+                     'bool': "exec [LifeChanging].[METD].[usp_InsertBoolValueActivities] @memberID = %d, @MetricID = %d, @Bool = %s, @measured=@today,@CreatedAt=@today",
                      'enum': "exec [LifeChanging].[METD].[usp_InsertEnumValueActivities] @memberID = %d, @MetricID = %d, @EnumValueID = %s, @measured=@today,@CreatedAt=@today",
                      # use yesterday for reference codes so that if the member also have float/boolean/enum data for today, a separate record will be created for the reference code
                      'refcode': "exec [LifeChanging].[METD].[usp_InsertReferenceCodeActivities] @memberID = %d, @MetricID = %d, @ReferenceCodeID = %s, @measured=@yesterday,@CreatedAt=@yesterday"}
