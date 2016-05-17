@@ -191,3 +191,9 @@ def main(argv):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+
+
+# save object lists as fixtures
+# can call the parse methods and set the fixture to be at the session level (assuming one client per session)
+# else module or class
+# if each client gets set up as its own test file, that is considered a module so we could set the fixture at the module level, as well as set configurations such as file names
