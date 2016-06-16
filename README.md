@@ -10,17 +10,7 @@ Installation:
 4. Install the openpyxl python library:
 	Type "python -m pip install openpyxl", press Enter
 
-5. If you do not have one yet, create a (free) GitHub account - https://github.com
-
-6. Fork my repository so you have your own local copy:
-	a. Go to https://github.com/cduggan1708/test_grid_metrics
-	b. Click "Fork"
-	c. Go back to your GitHub account and verify you have a copy of test_grid_metrics
-
-7. Clone the repo
-	a. On your GitHub account, in the forked repo of test_grid_metrics, copy the clone URL (the clipboard icon)
-	b. Type "git clone " and paste the cloned URL, press Enter
-	c. You now have the forked repo cloned to your host machine
+5. Clone the repo from https://provanthealth.visualstudio.com/Provant/_git/QA 
 
 
 
