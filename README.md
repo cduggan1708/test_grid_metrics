@@ -45,6 +45,14 @@ To run it with the test grid template:
 To run with your own excel file, either copy the excel file into this directory or give the full path to the -f argument
 
 
+Received Date:
+
+If Received Date is applicable to your test cases, pass in -r flag to get the RDC-specific stored procedure execute statements.
+	For now the following data is hardcoded and will need to be manually replaced:
+		@clientId=10030			# to get the correct id use getProgramAndClientIDs.sql
+		@formTemplateId=175		# to get the correct formTemplateId use getClientHSRFFormTemplate.sql
+
+
 
 Requirements:
 
